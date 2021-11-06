@@ -16,6 +16,9 @@ const CarSchema = new mongoose.Schema({
     avatar: {
         type: String
     },
+    description: {
+        type: String
+    },
     date: {
         type: Date,
         default: Date.now
