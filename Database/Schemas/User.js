@@ -1,23 +1,23 @@
 const mongoose = require('mongoose')
 
 const UserSchema = new mongoose.Schema({
-    name: {
+    name: { // Name, eg. Michael Nichol
         type: String,
         required: true
     },
-    email: {
+    email: { // Email, doubles as username for login purposes
         type: String,
         required: true,
         unique: true
     },
-    password: {
+    password: { // Password, hashed with bcrypt
         type: String,
         required: true
     },
-    avatar: {
+    avatar: { // Avatar url given with gravatar
         type: String
     },
-    date: {
+    date: { // Account creation date, cannot be modified
         type: Date,
         default: Date.now
     }
