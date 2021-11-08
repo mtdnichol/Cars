@@ -1,6 +1,10 @@
 const mongoose = require('mongoose')
 
 const CarSchema = new mongoose.Schema({
+    user: { //Refers to the id of another object, relational
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'user'
+    },
     handle: { // Handle for if the user has a nickname for their car
         type: String
     },

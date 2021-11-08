@@ -11,10 +11,6 @@ const ProfileSchema = new mongoose.Schema({
     bio: { // User bio to describe themselves on their profile.  May not be necessary
         type: String
     },
-    cars: { // Array of cars related to all the cars the user owns / has owned on their profile
-        type: [mongoose.Schema.Types.ObjectId],
-        ref: 'car'
-    },
     organization: { // Name of organization if user has a store or car organization
         type: String
     },

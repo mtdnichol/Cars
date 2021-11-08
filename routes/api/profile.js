@@ -3,6 +3,9 @@ const router = express.Router()
 const auth = require('../../middleware/auth')
 
 const Profile = require('../../Database/Schemas/Profile')
+const Car = require('../../Database/Schemas/Car')
+const Post = require('../../Database/Schemas/Post')
+const User = require('../../Database/Schemas/User')
 
 // @route         GET api/profile/me
 // Description:   Get current users profile
@@ -96,9 +99,29 @@ router.get('/user/:user_id', async (req, res) => {
         res.json(profile)
     } catch (err) {
         console.error(err.message)
-        if (err.kind == 'ObjectId')
+        if (err.kind === 'ObjectId')
             return res.status(400).json({ msg: 'Profile not found' })
 
+        res.status(500).send('Server Error')
+    }
+})
+
+// @route         DELETE api/profile/delete
+// Description:   Delete profile, user, and their posts
+// Access:        Private
+router.get('/', auth, async (req, res) => {
+    try {
+        // Remove all attributes associated with a user
+        await Profile.findOneAndRemove({ user: req.user.id })
+        await Post.remove({ user: req.user.id })
+        await Car.remove({ user: req.user.id })
+
+        //Remove user itself last,
+        await User.findOneAndRemove({ _id: req.user.id })
+
+        res.json({ msg: 'User deleted' })
+    } catch (err) {
+        console.error(err.message)
         res.status(500).send('Server Error')
     }
 })
