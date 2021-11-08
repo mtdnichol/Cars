@@ -14,5 +14,28 @@ const ProfileSchema = new mongoose.Schema({
     cars: { // Array of cars related to all the cars the user owns / has owned on their profile
         type: [mongoose.Schema.Types.ObjectId],
         ref: 'car'
+    },
+    organization: { // Name of organization if user has a store or car organization
+        type: String
+    },
+    social: { // Links to other social media platforms that the user may post on
+        youtube: { // Youtube.com
+            type: String
+        },
+        twitter: { // Twitter.com
+            type: String
+        },
+        facebook: { // Facebook.com
+            type: String
+        },
+        instagram: { // Instagram.com
+            type: String
+        }
+    },
+    date: { // Date the account profile was created
+        type: Date,
+        default: Date.now()
     }
 })
+
+module.exports = User = mongoose.model('profile', ProfileSchema)

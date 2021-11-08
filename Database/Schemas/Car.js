@@ -42,30 +42,7 @@ const CarSchema = new mongoose.Schema({
     date: { // Date the car was created on server for serverside purposes
         type: Date,
         default: Date.now
-    },
-    post: [{ // Posts related to a given car, might want to move to own schema and relate back to a car
-        date: { // Date the post was created
-            type: Date,
-            default: Date.now
-        },
-        caption: { // Caption to describe the photo in the post
-            type: String
-        },
-        location: { // Location the photo was taken
-            type: String
-        },
-        photo: [{ // Cloudinary photo route for associated photo(s) with the post
-            filepath: {
-                type: String,
-                required: true
-            },
-            filename: {
-                type: String,
-                required: true
-            }
-        }]
-    }]
-
+    }
 })
 
 module.exports = User = mongoose.model('user', CarSchema)
