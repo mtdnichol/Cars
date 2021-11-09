@@ -64,7 +64,7 @@ router.get('/', auth, async (req, res) => {
 // Access:        Private (Must be logged in to see posts)
 router.get('/:id', auth, async (req, res) => {
     try {
-        const post = await Post.findById(req.params.id)// All posts ordered by newest
+        const post = await Post.findById(req.params.id) // Query posts by relation to car
 
         if (!post)
             return res.status(404).json({msg: 'Post not found'})
@@ -78,13 +78,34 @@ router.get('/:id', auth, async (req, res) => {
     }
 })
 
+// MOVED TO PROFILE, WHEN A USER ACCESSES PROFILE ALL POSTS ARE DISPLAYED
 //@todo Check if there will be conflicts between post by post ID and UserID
 // @route         GET api/posts/:user_id
 // Description:   Get all posts by a users' ID
 // Access:        Private (Must be logged in to see posts)
-router.get('/:user_id', auth, async (req, res) => {
+// router.get('/:user_id', auth, async (req, res) => {
+//     try {
+//         const posts = await Post.find({ user: req.params.id })// All posts ordered by newest
+//
+//         if (!posts)
+//             return res.status(404).json({msg: 'User not found'})
+//
+//         res.json(posts)
+//     } catch (err) {
+//         console.error(err.message)
+//         if (err.kind === 'ObjectId')
+//             return res.status(404).json({msg: 'User not found'})
+//         res.status(500).send('Server Error')
+//     }
+// })
+
+//@todo Check if there will be conflicts between post by post ID and UserID and CarID
+// @route         GET api/posts/:user_id
+// Description:   Get all posts by a users' ID
+// Access:        Private (Must be logged in to see posts)
+router.get('/:car_id', auth, async (req, res) => {
     try {
-        const posts = await Post.find({ user: req.params.id })// All posts ordered by newest
+        const posts = await Post.find({ car: req.params.id })// All posts ordered by newest
 
         if (!posts)
             return res.status(404).json({msg: 'User not found'})

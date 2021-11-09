@@ -93,10 +93,14 @@ router.get('/', async (req, res) => {
 router.get('/user/:user_id', async (req, res) => {
     try {
         const profile = await Profile.findOne({ user: req.params.id }).populate('user', ['name', 'avatar'])
+        const posts = await Post.find({ user: req.params.id }).sort({ date: -1 })
 
         if (!profile) return res.status(400).json({ msg: 'Profile not found' })
 
-        res.json(profile)
+        res.json({
+            profile,
+            posts
+        })
     } catch (err) {
         console.error(err.message)
         if (err.kind === 'ObjectId')
