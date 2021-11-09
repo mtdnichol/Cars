@@ -13,16 +13,7 @@ const PostSchema = new mongoose.Schema({
         type: Date,
         default: Date.now
     },
-    caption: { // Caption to describe the photo in the post
-        type: String
-    },
-
-    // Name and avatar are redundantly stored in case a user deletes their profile, might be an oversight, can remove
-    // and ref user through ID directly
-    name: { // Stores the posters display name
-        type: String
-    },
-    avatar: { // Stores the posters avatar
+    text: { // Caption to describe the photo in the post
         type: String
     },
     likes: [{ // Array of users who like the post
@@ -47,12 +38,6 @@ const PostSchema = new mongoose.Schema({
             type: String,
             required: true
         },
-        name: { // Name of user who commented
-            type: String,
-        },
-        avatar: { // Avatar of user who commented
-            type: String,
-        },
         date: { // Date the comment was created
             type: Date,
             default: Date.now()
@@ -61,7 +46,8 @@ const PostSchema = new mongoose.Schema({
     location: { // Location the photo was taken
         type: String
     },
-    photo: [{ // Cloudinary photo route for associated photo(s) with the post
+    //@todo Change to allow many photos when you learn cloudinary
+    photo: [{ // Cloudinary photo route for associated photo with the post
         filepath: {
             type: String,
             required: true
@@ -69,8 +55,9 @@ const PostSchema = new mongoose.Schema({
         filename: {
             type: String,
             required: true
-        }
+        },
+        required: true
     }]
 })
 
-module.exports = User = mongoose.model('post', PostSchema)
+module.exports = Post = mongoose.model('post', PostSchema)
