@@ -5,6 +5,18 @@ const ProfileSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'user'
     },
+    following: [{ // Array of users followed
+        user: { // Only allows the user to like a post once
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'users'
+        }
+    }],
+    followers: [{
+        user: { // Only allows the user to like a post once
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'users'
+        }
+    }],
     location: { // Users geographical location, could be used for meetups
         type: String
     },

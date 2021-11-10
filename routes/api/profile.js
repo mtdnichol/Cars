@@ -8,16 +8,20 @@ const Post = require('../../Database/Schemas/Post')
 const User = require('../../Database/Schemas/User')
 
 // @route         GET api/profile/me
-// Description:   Get current users profile
+// Description:   Get current users profile, along with their associated posts
 // Access:        Private (Getting the current users ID)
 router.get('/me', auth, async (req, res) => {
     try {
         const profile = await Profile.findOne({ user: req.user.id }).populate('user', ['name', 'avatar']);
+        const posts = await Post.find({}).sort({ date: -1 })
 
         if (!profile)
             return res.status(400).json({ msg: 'There is no profile for this user' })
 
-        res.json(profile)
+        res.json({
+            profile,
+            posts
+        })
     } catch (err) {
         console.error(err.message)
         res.status(500).send('Server Error')
@@ -124,6 +128,68 @@ router.get('/', auth, async (req, res) => {
         await User.findOneAndRemove({ _id: req.user.id })
 
         res.json({ msg: 'User deleted' })
+    } catch (err) {
+        console.error(err.message)
+        res.status(500).send('Server Error')
+    }
+})
+
+// @route         PUT api/profile/follow/:id
+// Description:   Follow or unfollow a user
+// Access:        Private
+router.put('/follow/:id', auth, async (req, res) => {
+    try {
+        const currUser = await Profile.findById(req.user.id) // Current user that wants to follow targetUser
+        const targetUser = await Profile.findById(req.params.id) // User that is being followed
+
+        // Check if the target user exists
+        if (!targetUser)
+            return res.status(404).json({ msg: 'Target user not found' })
+
+        // Check if the current user exists
+        if (!currUser)
+            return res.status(400).json({ msg: 'Current user not found' })
+
+        // Check if current user already follows the other user
+        if (targetUser.followers.filter(follow => follow.user.toString() === req.user.id).length > 0) {
+            //User already follows the other user, begin unfollowing
+            const currUserRemoveIndex = currUser.following.map(follow => follow.user.toString()).indexOf(req.params.id)
+            const targetUserRemoveIndex = targetUser.followers.map(follow => follow.user.toString()).indexOf(req.user.id)
+
+            // Remove target user from following and current user from target user's followers
+            currUser.following.splice(currUserRemoveIndex, 1)
+            targetUser.followers.splice(targetUserRemoveIndex, 1)
+
+            await currUser.save()
+            await targetUser.save()
+
+            const targetFollowers = targetUser.followers
+            const userFollowing = currUser.following
+
+            return res.json({
+                targetFollowers,
+                userFollowing
+            })
+        }
+
+        //User has not yet followed, complete follow request
+
+        // Append target user to current user following
+        // Append current user to target user followers
+        currUser.following.unshift({ user: targetUser.user })
+        targetUser.followers.unshift({ user: req.user.id })
+
+        await currUser.save()
+        await targetUser.save()
+
+        // Cannot directly return object.property in res.json with {}
+        const targetFollowers = targetUser.followers
+        const userFollowing = currUser.following
+
+        res.json({
+            targetFollowers,
+            userFollowing
+        })
     } catch (err) {
         console.error(err.message)
         res.status(500).send('Server Error')

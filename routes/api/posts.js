@@ -78,47 +78,6 @@ router.get('/:id', auth, async (req, res) => {
     }
 })
 
-// MOVED TO PROFILE, WHEN A USER ACCESSES PROFILE ALL POSTS ARE DISPLAYED
-//@todo Check if there will be conflicts between post by post ID and UserID
-// @route         GET api/posts/:user_id
-// Description:   Get all posts by a users' ID
-// Access:        Private (Must be logged in to see posts)
-// router.get('/:user_id', auth, async (req, res) => {
-//     try {
-//         const posts = await Post.find({ user: req.params.id })// All posts ordered by newest
-//
-//         if (!posts)
-//             return res.status(404).json({msg: 'User not found'})
-//
-//         res.json(posts)
-//     } catch (err) {
-//         console.error(err.message)
-//         if (err.kind === 'ObjectId')
-//             return res.status(404).json({msg: 'User not found'})
-//         res.status(500).send('Server Error')
-//     }
-// })
-
-//@todo Check if there will be conflicts between post by post ID and UserID and CarID
-// @route         GET api/posts/:user_id
-// Description:   Get all posts by a users' ID
-// Access:        Private (Must be logged in to see posts)
-router.get('/:car_id', auth, async (req, res) => {
-    try {
-        const posts = await Post.find({ car: req.params.id })// All posts ordered by newest
-
-        if (!posts)
-            return res.status(404).json({msg: 'User not found'})
-
-        res.json(posts)
-    } catch (err) {
-        console.error(err.message)
-        if (err.kind === 'ObjectId')
-            return res.status(404).json({msg: 'User not found'})
-        res.status(500).send('Server Error')
-    }
-})
-
 // @route         DELETE api/posts/:id
 // Description:   Delete a post
 // Access:        Private
@@ -141,6 +100,106 @@ router.get('/:id', auth, async (req, res) => {
         console.error(err.message)
         if (err.kind === 'ObjectId')
             return res.status(404).json({msg: 'Post not found'})
+        res.status(500).send('Server Error')
+    }
+})
+
+// @route         PUT api/posts/like/:id
+// Description:   Like or unlike a post
+// Access:        Private
+// Note:          My application will only have one like button, therefore like and dislike can be handled in the same put
+router.put('/like/:id', auth, async (req, res) => {
+    try {
+        const post = await Post.findById(req.params.id)
+
+        // Check if the post exists
+        if (!post)
+            return res.status(404).json({ msg: 'Post not found' })
+
+        // Check if the post has already been liked by the current user
+        if (post.likes.filter(like => like.user.toString() === req.user.id).length > 0) { // Iterate over liked user ids
+            // User already likes the post, begin dislike
+            const removeIndex = post.likes.map(like => like.user.toString()).indexOf(req.user.id)
+
+            // Remove user from a posts likes
+            post.likes.splice(removeIndex, 1)
+
+            await post.save()
+
+            return res.json(post.likes)
+        }
+
+        //User has not yet liked, complete like request
+
+        post.likes.unshift({ user: req.user.id }) // Unshift appends to the beginning of the array
+
+        await post.save()
+
+        res.json(post.likes)
+    } catch (err) {
+        console.error(err.message)
+        res.status(500).send('Server Error')
+    }
+})
+
+// @todo Make comments have threads, current architecture only supports single comments on post
+// @route         POST api/posts/comment/:id
+// Description:   User creates a comment on a post
+// Access:        private
+router.post('/comment/:id', auth,
+    check('text', 'Text is required').not().isEmpty(), // Insert photo validation here
+    async (req, res) => {
+        const errors = validationResult(req)
+        if (!errors.isEmpty())
+            return res.status(400).json({ errors: errors.array() })
+
+        try {
+            const post = await Post.findById(req.params.id)
+
+            // Error is related to the date field in comment model, ignore
+            post.comments.unshift({
+                user: req.user.id,
+                text: req.body.text
+            })
+
+            await post.save()
+
+            res.json(post.comments)
+        } catch (err) {
+            console.error(err.message)
+            res.status(500).send('Server Error')
+        }
+    })
+
+// @route         POST api/posts/comment/:id/:comment_id
+// Description:   Delete a comment
+// Access:        private
+router.delete('/comment/:id/:comment_id', auth, async (req, res) => {
+    try {
+        const post = await Post.findById(req.params.id)
+
+        // Get target comment
+        const comment = post.comments.find(comment => comment.id === req.params.comment_id)
+
+        // Check that the comment exists
+        if (!comment)
+            return res.status(404).json({ msg: 'Comment does not exist' })
+
+        // Check user owns comment
+        if (comment.user.toString() !== req.user.id)
+            return res.status(401).json({ msg: 'User not authorized' })
+
+        const removeIndex = post.comments.map(comment => comment.id.toString()).indexOf(req.params.comment_id)
+        if (!comment)
+            return res.status(404).json({ msg: 'Comment does not exist' })
+
+        // Remove the comment
+        post.comments.splice(removeIndex, 1)
+        await post.save()
+
+        res.json(post.comments)
+    } catch (err) {
+        console.error(err.message)
         res.status(500).send('Server Error')
     }
 })
