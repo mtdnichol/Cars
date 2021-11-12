@@ -46,7 +46,6 @@ const PostSchema = new mongoose.Schema({
     location: { // Location the photo was taken
         type: String
     },
-    //@todo Change to allow many photos when you learn cloudinary
     photo: [{ // Cloudinary photo route for associated photo with the post
         filepath: {
             type: String,
@@ -55,8 +54,7 @@ const PostSchema = new mongoose.Schema({
         filename: {
             type: String,
             required: true
-        },
-        required: true
+        }
     }]
 })
 
