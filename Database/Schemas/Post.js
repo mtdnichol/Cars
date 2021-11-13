@@ -25,8 +25,7 @@ const PostSchema = new mongoose.Schema({
     tags: [{ // Tags a user may associate with their post to group it with other like posts
         text: {
             type: String,
-            required: true,
-            unique: true
+            required: true
         }
     }],
     comments: [{
@@ -47,11 +46,7 @@ const PostSchema = new mongoose.Schema({
         type: String
     },
     photo: [{ // Cloudinary photo route for associated photo with the post
-        filepath: {
-            type: String,
-            required: true
-        },
-        filename: {
+        path: {
             type: String,
             required: true
         }

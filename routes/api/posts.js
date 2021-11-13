@@ -1,48 +1,74 @@
 const express = require('express')
 const router = express.Router()
 const auth = require('../../middleware/auth')
-const { check, validationResult } = require('express-validator/check')
+const { check, validationResult } = require('express-validator')
+
+const upload = require('../../Database/multer')
+const cloudinary = require('../../Database/cloudinary')
 
 const Post = require('../../Database/Schemas/Post')
 const User = require('../../Database/Schemas/User')
 const Profile = require('../../Database/Schemas/Profile')
 const Car = require('../../Database/Schemas/Car')
 
-// @route         POST api/posts
-// Description:   User creates a new post
-// Access:        private
-// Since a user can post strictly a photo, no validation other than the photo is required
-router.post('/', auth,
-    check(), // Insert photo validation here
-    async (req, res) => {
-    //@todo Add image validation
-        const errors = validationResult(req)
-        if (!errors.isEmpty())
-            return res.status(400).json({ errors: errors.array() })
+// @route         POST api/posts/
+// Description:   Create a post
+// Access:        Private (Authenticates the current users ID)
+router.post('/', auth, async (req, res) => {
+    const {
+        text,
+        tags,
+        location
+    } = req.body
+    const photo = req.file
+    const photos = req.files
 
-        //@todo May have to update to accept many photos when cloudinary is implemented
-        const {
-            caption,
-            tags,
-            location,
-            photo
-        } = req.body
+    const postFields = {
+        user: req.user.id,
+        text: text,
+        location: location
+    }
 
-        try {
-            const postFields = {}
-            postFields.user = req.user.id
-            if (location) postFields.location = location
-            if (caption) postFields.caption = caption
-            if (tags) postFields.tags = tags.split(',').map(tag => tag.trim())
-            postFields.photo = photo
+    try {
+        const post = new Post(postFields)
 
-            const post = await postFields.save()
+        // Parse tags
+        if (tags) {
+            const uniqueTags = [... new Set(tags.split(','))]
 
-            res.json(post)
-        } catch (err) {
-            console.error(err.message)
-            res.status(500).send('Server Error')
+            for (const tag of uniqueTags) {
+                post.tags.push({ text: tag })
+            }
         }
+
+        // Parse and upload images
+        // https://andela.com/insights/how-to-use-cloudinary-and-nodejs-to-upload-multiple-images/
+        const uploader = async (path) => await cloudinary.uploads(path, 'Images')
+
+        // Single photo
+        if (photo) {
+            const { path } = photo
+            const newPath = await uploader(path)
+
+            post.photos.push({ path: newPath })
+        }
+
+        // Many photos
+        if (photos) {
+            for (const photo of photos) {
+                const { path } = photo
+                const newPath = await uploader(path)
+                post.photos.push({ path: newPath })
+            }
+        }
+
+        await post.save()
+
+        res.json(post)
+    } catch (err) {
+        console.error(err.message)
+        res.status(500).send('Server Error')
+    }
 })
 
 // @route         GET api/posts/
