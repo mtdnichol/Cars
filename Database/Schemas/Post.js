@@ -46,7 +46,11 @@ const PostSchema = new mongoose.Schema({
         type: String
     },
     photo: [{ // Cloudinary photo route for associated photo with the post
-        path: {
+        publicID: {
+            type: String,
+            required: true
+        },
+        url: {
             type: String,
             required: true
         }

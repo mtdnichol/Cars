@@ -14,7 +14,7 @@ const Car = require('../../Database/Schemas/Car')
 // @route         POST api/posts/
 // Description:   Create a post
 // Access:        Private (Authenticates the current users ID)
-router.post('/', auth, async (req, res) => {
+router.post('/', auth, upload.array('image'), async (req, res) => {
     const {
         text,
         tags,
@@ -50,7 +50,10 @@ router.post('/', auth, async (req, res) => {
             const { path } = photo
             const newPath = await uploader(path)
 
-            post.photos.push({ path: newPath })
+            post.photos.push({
+                publicID: newPath.public_id,
+                url: newPath.url
+            })
         }
 
         // Many photos
@@ -58,7 +61,10 @@ router.post('/', auth, async (req, res) => {
             for (const photo of photos) {
                 const { path } = photo
                 const newPath = await uploader(path)
-                post.photos.push({ path: newPath })
+                post.photos.push({
+                    publicID: newPath.public_id,
+                    url: newPath.url
+                })
             }
         }
 
@@ -117,6 +123,11 @@ router.get('/:id', auth, async (req, res) => {
         // Ensure the user that deletes the post owns the post
         if (post.user.toString() !== req.user.id) {
             return res.status(401).json({ msg: 'User not authorized' })
+        }
+
+        // Remove images associated with post from cloudinary
+        for (const entry in post.photo) {
+            cloudinary.uploader.destroy('')
         }
 
         await post.remove();

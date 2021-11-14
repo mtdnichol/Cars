@@ -1,5 +1,6 @@
 const cloudinary = require('cloudinary').v2
 const dotenv = require('dotenv')
+const {json} = require("express");
 
 dotenv.config()
 
@@ -9,7 +10,7 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_API_SECRET
 })
 
-exports.uploads = (file, folder) => {
+uploads = (file, folder) => {
     return new Promise(resolve => {
         cloudinary.uploader.upload(file, (result) => {
             resolve({
@@ -22,3 +23,10 @@ exports.uploads = (file, folder) => {
         })
     })
 }
+
+remove = (public_id) => {
+    cloudinary.uploader.destroy(public_id, function(result) { console.log(result) });
+}
+
+module.exports = { uploads, remove }
+
