@@ -34,12 +34,11 @@ router.post('/',
                 return res.status(400).json( {errors: [{msg: 'User already exists'}]})
             }
 
-            // Get user gravatar
-            const avatar = gravatar.url(email, {
-                s: 200, //Default size
-                r: 'pg', //No naked people
-                d: 'mm' //Gives a default image without gravatar
-            })
+            //@todo Make a default avatar
+            const avatar = {
+                url: "ads",
+                publicID: "asd"
+            }
 
             user = new User({ name, email, avatar, password })
 

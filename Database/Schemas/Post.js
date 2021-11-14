@@ -45,7 +45,7 @@ const PostSchema = new mongoose.Schema({
     location: { // Location the photo was taken
         type: String
     },
-    photo: [{ // Cloudinary photo route for associated photo with the post
+    photos: [{ // Cloudinary photo route for associated photo with the post
         publicID: {
             type: String,
             required: true

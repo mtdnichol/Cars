@@ -25,8 +25,30 @@ uploads = (file, folder) => {
 }
 
 remove = (public_id) => {
-    cloudinary.uploader.destroy(public_id, function(result) { console.log(result) });
+    return new Promise(resolve => {
+        cloudinary.uploader.destroy(public_id, (result) => {
+            resolve({
+                url: result.url,
+                id: result.public_id
+            })
+        }, {})
+    })
 }
 
-module.exports = { uploads, remove }
+update = (file, folder, public_id) => {
+    return new Promise(resolve => {
+        cloudinary.uploader.destroy(public_id)
+        cloudinary.uploader.upload(file, (result) => {
+            resolve({
+                url: result.url,
+                id: result.public_id
+            })
+        }, {
+            resource_type: "auto",
+            folder: folder
+        })
+    })
+}
+
+module.exports = { uploads, remove, update }
 

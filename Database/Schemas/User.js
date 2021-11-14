@@ -14,8 +14,15 @@ const UserSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    avatar: { // Avatar url given with gravatar
-        type: String
+    avatar: { // Avatar linked to cloudinary image
+        publicID: {
+            type: String,
+            required: true
+        },
+        url: {
+            type: String,
+            required: true
+        }
     },
     date: { // Account creation date, cannot be modified
         type: Date,

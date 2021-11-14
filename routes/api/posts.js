@@ -43,7 +43,7 @@ router.post('/', auth, upload.array('image'), async (req, res) => {
 
         // Parse and upload images
         // https://andela.com/insights/how-to-use-cloudinary-and-nodejs-to-upload-multiple-images/
-        const uploader = async (path) => await cloudinary.uploads(path, 'Images')
+        const uploader = async (path) => await cloudinary.uploads(path, req.user.id)
 
         // Single photo
         if (photo) {
@@ -123,11 +123,6 @@ router.get('/:id', auth, async (req, res) => {
         // Ensure the user that deletes the post owns the post
         if (post.user.toString() !== req.user.id) {
             return res.status(401).json({ msg: 'User not authorized' })
-        }
-
-        // Remove images associated with post from cloudinary
-        for (const entry in post.photo) {
-            cloudinary.uploader.destroy('')
         }
 
         await post.remove();
