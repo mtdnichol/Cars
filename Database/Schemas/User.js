@@ -22,6 +22,10 @@ const UserSchema = new mongoose.Schema({
         url: {
             type: String,
             required: true
+        },
+        default: {
+            type: Boolean,
+            default: true
         }
     },
     date: { // Account creation date, cannot be modified
