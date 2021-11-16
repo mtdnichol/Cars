@@ -1,30 +1,52 @@
 import React, { useState } from "react";
-import {Link} from "react-router-dom";
+import {Link, Navigate } from "react-router-dom";
 import axios from "axios";
 import { connect } from 'react-redux'
 import { setAlert } from "../../actions/alert";
+import { register } from "../../actions/auth";
 import PropTypes from 'prop-types'
 
-const Register = ({ setAlert }) => {
+const Register = ({ setAlert, register, isAuthenticated }) => {
     const [formData, setFormData] = useState({
         name: '',
         email: '',
         password: '',
-        password2: ''
+        password_verify: ''
     })
 
-    const { name, email, password, password2 } = formData // Pulls fields from formData
+    const { name, email, password, password_verify } = formData // Pulls fields from formData
 
     const onChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value }) // When you type in a input, it updates the state.  Otherwise cannot type in boxes
+    // const isSame = (e) => {
+    //     const currPass = document.getElementById('password')
+    //     const currPass_verify = document.getElementById('password_verify')
+    //
+    //     if (currPass.value === currPass_verify.value) {
+    //         currPass.className += "input-valid"
+    //         currPass_verify.className += "input-valid"
+    //     } else {
+    //         currPass.className += "input-invalid"
+    //         currPass_verify.className += "input-invalid"
+    //     }
+    // }
+    //
+    // const twoCalls = e => {
+    //     onChange(e)
+    //     isSame(e)
+    // }
 
     const onSubmit = async (e) => { // Validation that the users passwords were entered correctly
         e.preventDefault();
-        if (password !== password2)
-            setAlert('Passwords do not match', 'danger') // Calls actions/alert
+        if (password !== password_verify)
+            setAlert('Passwords do not match', 'danger') // Calls actions/alert to display an alert to the user
         else {
-            console.log('SUCCESS')
+            return register({ name, email, password }) // Pushes to actions/auth to create the account
         }
     }
+
+    // Redirect if logged in
+    if (isAuthenticated)
+        return <Navigate to='/feed' />
 
     return (
         <section className="container">
@@ -32,14 +54,15 @@ const Register = ({ setAlert }) => {
             <p className="lead">
                 <i className="fas fa-user" /> Create Your Account
             </p>
-            <form className="form" onSubmit={onSubmit}>
+            <form className="form" onSubmit={ onSubmit }>
                 <div className="form-group">
                     <input
                         type="text"
                         placeholder="Name"
+                        id="name"
                         name="name"
                         value={name}
-                        onChange={onChange}
+                        onChange={ onChange }
                         required
                     />
                 </div>
@@ -47,9 +70,10 @@ const Register = ({ setAlert }) => {
                     <input
                         type="email"
                         placeholder="Email Address"
+                        id="email"
                         name="email"
                         value={email}
-                        onChange={onChange}
+                        onChange={ onChange }
                         required
                     />
                     <small className="form-text">
@@ -61,9 +85,10 @@ const Register = ({ setAlert }) => {
                     <input
                         type="password"
                         placeholder="Password"
+                        id="password"
                         name="password"
                         value={password}
-                        onChange={onChange}
+                        onChange={ onChange }
                         required
                     />
                 </div>
@@ -71,9 +96,10 @@ const Register = ({ setAlert }) => {
                     <input
                         type="password"
                         placeholder="Confirm Password"
-                        name="password2"
-                        value={password2}
-                        onChange={onChange}
+                        id="password_verify"
+                        name="password_verify"
+                        value={password_verify}
+                        onChange={ onChange }
                         required
                     />
                 </div>
@@ -87,7 +113,13 @@ const Register = ({ setAlert }) => {
 }
 
 Register.propTypes = {
-    setAlert: PropTypes.func.isRequired
+    setAlert: PropTypes.func.isRequired,
+    register: PropTypes.func.isRequired,
+    isAuthenticated: PropTypes.bool
 }
 
-export default connect(null, { setAlert })(Register)
+const mapStateToProps = state => ({
+    isAuthenticated: state.auth.isAuthenticated
+})
+
+export default connect(mapStateToProps, { setAlert, register })(Register)

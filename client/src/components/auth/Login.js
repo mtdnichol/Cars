@@ -1,7 +1,11 @@
-import React, {useState} from "react";
-import {Link} from "react-router-dom";
+import React, { useState } from "react";
+import {Link, Navigate } from "react-router-dom";
+import { connect } from 'react-redux'
+import PropTypes from "prop-types";
+import { login } from '../../actions/auth'
+import {setAlert} from "../../actions/alert";
 
-const Login = () => {
+const Login = ({ setAlert, login, isAuthenticated }) => {
     const [formData, setFormData] = useState({
         email: '',
         password: ''
@@ -13,8 +17,12 @@ const Login = () => {
 
     const onSubmit = async (e) => { // Validation that the users passwords were entered correctly
         e.preventDefault();
-        console.log('SUCCESS')
+        return login({ email, password })
     }
+
+    // Redirect if logged in
+    if (isAuthenticated)
+        return <Navigate to='/feed' />
 
     return (
         <section className="container">
@@ -52,4 +60,13 @@ const Login = () => {
     )
 }
 
-export default Login
+Login.propTypes = {
+    login: PropTypes.func.isRequired,
+    isAuthenticated: PropTypes.bool
+}
+
+const mapStateToProps = state => ({
+    isAuthenticated: state.auth.isAuthenticated
+})
+
+export default connect(mapStateToProps, { setAlert, login })(Login)

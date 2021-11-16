@@ -583,3 +583,11 @@ button {
   transform: translateX(-50%);
   display: inline-block;
 }
+
+.input-valid {
+  border: 1px solid firebrick;
+}
+
+.input-invalid {
+  border: 1px solid limegreen;
+}
