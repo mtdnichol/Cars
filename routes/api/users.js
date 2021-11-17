@@ -8,6 +8,7 @@ dotenv.config({path: './config/.env'})
 const { check, validationResult } = require('express-validator');
 
 const User = require('../../Database/Schemas/User')
+const Profile = require('../../Database/Schemas/Profile')
 
 // @route         POST api/users
 // Description:   Register a new user
@@ -48,6 +49,12 @@ router.post('/',
 
             //Save user
             await user.save()
+
+            //Create profile for user after a successful register
+            const profile = new Profile({
+                user: user.id
+            })
+            await profile.save()
 
             // Return jsonwebtoken
             const payload = {

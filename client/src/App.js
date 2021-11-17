@@ -12,6 +12,7 @@ import Alert from './components/layout/Alert'
 import Register from './components/auth/Register'
 import Login from './components/auth/Login'
 import Feed from "./components/feed/Feed";
+import Profile from "./components/profile/Profile";
 import PrivateRoute from "./components/routing/PrivateRoute"; // Ensures a user is authenticated before allowing them to access a page
 
 
@@ -41,6 +42,10 @@ const App = () => {
                     <Route
                         path="feed"
                         element={<PrivateRoute component={ Feed } />}
+                    />
+                    <Route
+                        path="profile"
+                        element={<PrivateRoute component={ Profile } />}
                     />
                 </Routes>
             </Fragment>
