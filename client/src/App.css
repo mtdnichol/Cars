@@ -585,9 +585,9 @@ button {
 }
 
 .input-valid {
-  border: 1px solid firebrick;
+  border: 1px solid var(--success-color);
 }
 
 .input-invalid {
-  border: 1px solid limegreen;
+  border: 1px solid var(--danger-color);
 }
