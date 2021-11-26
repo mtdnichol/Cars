@@ -1,8 +1,8 @@
-import { GET_PROFILE, PROFILE_ERROR, CLEAR_PROFILE } from "../actions/types";
+import { GET_USER_POSTS, POST_ERROR } from "../actions/types";
 
 const initialState = {
-    profile: null, // Hold all profile data on login, or if visiting another profile, load other profile in here
-    profiles: [], // List of profiles
+    post: null, // Hold a single post if requested
+    posts: [], // Hold array of posts if requested
     loading: true, // Once a request is made, set to false
     error: {} // Any errors on request
 }
@@ -11,22 +11,16 @@ export default function (state = initialState, action) {
     const { type, payload } = action
 
     switch (type) {
-        case GET_PROFILE:
+        case GET_USER_POSTS:
             return {
                 ...state,
-                profile: payload,
+                posts: payload,
                 loading: false
             }
-        case PROFILE_ERROR:
+        case POST_ERROR:
             return {
                 ...state,
                 error: payload,
-                loading: false
-            }
-        case CLEAR_PROFILE:
-            return {
-                ...state,
-                profile: null,
                 loading: false
             }
         default:

@@ -1,18 +1,29 @@
-import React, {useEffect} from "react";
+import React, {Fragment, useEffect} from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { getCurrentProfile } from "../../actions/profile";
+import {Link} from "react-router-dom";
+import Spinner from "../layout/Spinner";
 
-const Profile = ({ getCurrentProfile, auth, profile }) => {
+const Profile = ({ getCurrentProfile, auth, profile: { profile } }) => {
     useEffect(() => {
         getCurrentProfile()
     }, [])
 
+    // @todo Separate profile sections into fragments, and use fragments to construct profile.
     return (
         <section className="container">
-            <div>
-                Profile
-            </div>
+            {profile === null ? (<Spinner />) : (
+                <Fragment>
+                    {auth.isAuthenticated &&
+                    auth.loading === false &&
+                    auth.user.id === profile.user.id && (
+                        <Link to="/profile/edit" className="btn btn-dark">
+                            Edit Profile
+                        </Link>
+                    )}
+                </Fragment>
+            )}
         </section>
     )
 }

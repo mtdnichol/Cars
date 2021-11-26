@@ -17,11 +17,13 @@ const UserSchema = new mongoose.Schema({
     avatar: { // Avatar linked to cloudinary image
         publicID: {
             type: String,
-            required: true
+            required: true,
+            default: ''
         },
         url: {
             type: String,
-            required: true
+            required: true,
+            default: 'https://res.cloudinary.com/carsapp/image/upload/v1636927678/resources/default_user_f4m6wc.png'
         },
         default: {
             type: Boolean,

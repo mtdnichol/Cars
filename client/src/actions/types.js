@@ -14,3 +14,8 @@ export const LOGOUT = 'LOGOUT'
 // Profile
 export const GET_PROFILE = 'GET_PROFILE'
 export const PROFILE_ERROR = 'PROFILE_ERROR'
+export const CLEAR_PROFILE = 'CLEAR_PROFILE'
+
+// Posts
+export const GET_USER_POSTS = 'GET_USER_POSTS'
+export const POST_ERROR = 'POST_ERROR'

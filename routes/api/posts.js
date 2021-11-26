@@ -91,6 +91,20 @@ router.get('/', auth, async (req, res) => {
     }
 })
 
+// @route         GET api/posts/user/:user_id
+// Description:   Get all posts by a user
+// Access:        Private (Must be logged in to see posts)
+router.get('/user/:user_id', auth, async (req, res) => {
+    try {
+        const posts = await Post.find({ user: req.params.id }).sort({ date: -1 }) // All posts ordered by newest
+
+        res.json(posts)
+    } catch (err) {
+        console.error(err.message)
+        res.status(500).send('Server Error')
+    }
+})
+
 // @route         GET api/posts/:id
 // Description:   Get a post by its id
 // Access:        Private (Must be logged in to see posts)

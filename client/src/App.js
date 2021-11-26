@@ -13,6 +13,7 @@ import Register from './components/auth/Register'
 import Login from './components/auth/Login'
 import Feed from "./components/feed/Feed";
 import Profile from "./components/profile/Profile";
+import EditProfile from "./components/profile/profile-forms/EditProfile";
 import PrivateRoute from "./components/routing/PrivateRoute"; // Ensures a user is authenticated before allowing them to access a page
 
 
@@ -46,6 +47,10 @@ const App = () => {
                     <Route
                         path="profile"
                         element={<PrivateRoute component={ Profile } />}
+                    />
+                    <Route
+                        path="profile/edit"
+                        element={<PrivateRoute component={ EditProfile } />}
                     />
                 </Routes>
             </Fragment>
