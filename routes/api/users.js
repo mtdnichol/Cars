@@ -4,11 +4,13 @@ const gravatar = require('gravatar')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const dotenv = require('dotenv')
+const crypto = require('crypto')
 dotenv.config({path: './config/.env'})
 const { check, validationResult } = require('express-validator');
 
 const User = require('../../Database/Schemas/User')
 const Profile = require('../../Database/Schemas/Profile')
+const nodemailer = require("nodemailer");
 
 // @route         POST api/users
 // Description:   Register a new user
@@ -71,6 +73,53 @@ router.post('/',
             console.error(err.message)
             return res.status(500).send('Server error')
         }
+})
+
+// @route         POST api/profile/forgot
+// Description:   Send recovery token to user
+// Access:        Public
+router.post('/forgot', async (req, res) => {
+    try {
+        const { email } = req.body
+
+        const user = await User.findOne({ email: email })
+        if (!user) {
+            return res.status(404).json( {errors: [{msg: 'User not found'}]})
+        }
+
+        let resetToken = crypto.randomBytes(32).toString('hex')
+        const hash = await bcrypt.hash(resetToken, 10)
+
+        user.token = {
+            key: hash,
+            createdAt: Date.now()
+        }
+
+        await user.save()
+
+        let testAccount = await nodemailer.createTestAccount();
+
+        let transporter = nodemailer.createTransport({
+            service: "gmail",
+            auth: {
+                user: process.env.GMAIL_USER, // generated ethereal user
+                pass: process.env.GMAIL_PASSWORD, // generated ethereal password
+            },
+        });
+
+        let info = await transporter.sendMail({
+            from: testAccount.user, // sender address
+            to: user.email, // list of receivers
+            subject: "Cars password reset", // Subject line
+            text: resetToken
+        });
+
+
+        res.json({ msg: 'Email sent' })
+    } catch (err) {
+        console.error(err.message)
+        return res.status(500).send('Server error')
+    }
 })
 
 module.exports = router

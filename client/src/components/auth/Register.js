@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import {Link, Navigate } from "react-router-dom";
-import axios from "axios";
 import { connect } from 'react-redux'
 import { setAlert } from "../../actions/alert";
 import { register } from "../../actions/auth";
@@ -17,23 +16,6 @@ const Register = ({ setAlert, register, isAuthenticated }) => {
     const { name, email, password, password_verify } = formData // Pulls fields from formData
 
     const onChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value }) // When you type in a input, it updates the state.  Otherwise cannot type in boxes
-    // const isSame = (e) => {
-    //     const currPass = document.getElementById('password')
-    //     const currPass_verify = document.getElementById('password_verify')
-    //
-    //     if (currPass.value === currPass_verify.value) {
-    //         currPass.className += "input-valid"
-    //         currPass_verify.className += "input-valid"
-    //     } else {
-    //         currPass.className += "input-invalid"
-    //         currPass_verify.className += "input-invalid"
-    //     }
-    // }
-    //
-    // const twoCalls = e => {
-    //     onChange(e)
-    //     isSame(e)
-    // }
 
     const onSubmit = async (e) => { // Validation that the users passwords were entered correctly
         e.preventDefault();

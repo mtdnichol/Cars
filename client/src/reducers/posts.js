@@ -7,7 +7,7 @@ const initialState = {
     error: {} // Any errors on request
 }
 
-export default function (state = initialState, action) {
+function postReducer (state = initialState, action) {
     const { type, payload } = action
 
     switch (type) {
@@ -27,3 +27,5 @@ export default function (state = initialState, action) {
             return state
     }
 }
+
+export default postReducer

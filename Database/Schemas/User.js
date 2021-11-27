@@ -14,6 +14,16 @@ const UserSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    token: {
+        key: {
+            type: String,
+        },
+        createdAt: {
+            type: Date,
+            default: Date.now(),
+            expires: 600
+        }
+    },
     avatar: { // Avatar linked to cloudinary image
         publicID: {
             type: String,

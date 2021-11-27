@@ -15,7 +15,7 @@ const initialState = {
     user: null // When the request to api/auth is completed, users mongodb results will be loaded
 }
 
-export default function (state = initialState, action) {
+function authReducer (state = initialState, action) {
     const { type, payload } = action
 
     switch (type) {
@@ -35,3 +35,5 @@ export default function (state = initialState, action) {
             return state
     }
 }
+
+export default authReducer
