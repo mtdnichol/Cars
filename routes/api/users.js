@@ -11,6 +11,9 @@ const { check, validationResult } = require('express-validator');
 const User = require('../../Database/Schemas/User')
 const Profile = require('../../Database/Schemas/Profile')
 const nodemailer = require("nodemailer");
+const auth = require("../../middleware/auth");
+const Post = require("../../Database/Schemas/Post");
+const Car = require("../../Database/Schemas/Car");
 
 // @route         POST api/users
 // Description:   Register a new user
@@ -75,7 +78,7 @@ router.post('/',
         }
 })
 
-// @route         POST api/profile/forgot
+// @route         POST api/users/forgot
 // Description:   Send recovery token to user
 // Access:        Public
 router.post('/forgot', async (req, res) => {
@@ -92,7 +95,8 @@ router.post('/forgot', async (req, res) => {
 
         user.token = {
             key: hash,
-            createdAt: Date.now()
+            createdAt: Date.now(),
+            expires: 600
         }
 
         await user.save()
@@ -111,14 +115,28 @@ router.post('/forgot', async (req, res) => {
             from: testAccount.user, // sender address
             to: user.email, // list of receivers
             subject: "Cars password reset", // Subject line
-            text: resetToken
+            text: `localhost:3000/recover?token=${resetToken}&id=${user._id}`
         });
 
 
-        res.json({ msg: 'Email sent' })
+        res.redirect('/recover')
     } catch (err) {
         console.error(err.message)
         return res.status(500).send('Server error')
+    }
+})
+
+// @route         POST api/users/recover
+// Description:   Recover an account by resetting password
+// Access:        Private
+router.post('/recover/:token', async (req, res) => {
+    try {
+        const { token, password } = req.body
+
+        const user = await User.findOne({ token})
+    } catch (err) {
+        console.error(err.message)
+        res.status(500).send('Server Error')
     }
 })
 

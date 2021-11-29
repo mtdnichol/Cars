@@ -38,6 +38,7 @@ router.post('/',
         }
 
         const {
+            location,
             bio,
             organization,
             youtube,
@@ -50,6 +51,7 @@ router.post('/',
 
         // Build all fields based on input information
         profileFields.user = req.user.id
+        if (location) profileFields.location = location
         if (bio) profileFields.bio = bio
         if (organization) profileFields.organization = organization
 

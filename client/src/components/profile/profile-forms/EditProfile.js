@@ -1,23 +1,39 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {Link, useNavigate} from "react-router-dom";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
-import { updateProfile } from '../../../actions/profile'
-import mapStateToProps from "react-redux/lib/connect/mapStateToProps";
+import { updateProfile, getCurrentProfile } from '../../../actions/profile'
 
+// Declared outside as to not trigger a useEffect, can now construct profileData
+const initialState = {
+    location: '',
+    bio: '',
+    organization: '',
+    youtube: '',
+    twitter: '',
+    facebook: '',
+    instagram: '',
+}
 
-const EditProfile = ({ updateProfile }) => {
+const EditProfile = ({ profile: { profile, loading }, updateProfile, getCurrentProfile }) => {
+    const [formData, setFormData] = useState(initialState);
     const navigate = useNavigate()
 
-    const [formData, setFormData] = useState({ // Profile fields with default values
-        location: '',
-        bio: '',
-        organization: '',
-        youtube: '',
-        twitter: '',
-        facebook: '',
-        instagram: '',
-    })
+    useEffect(() => {
+        if (!profile) getCurrentProfile()
+
+        if (!loading && profile) {
+            const profileData = { ...initialState };
+            for (const key in profile) {
+                if (key in profileData) profileData[key] = profile[key];
+            }
+            for (const key in profile.social) {
+                if (key in profileData) profileData[key] = profile.social[key];
+            }
+            setFormData(profileData);
+        }
+        console.log(profile.location)
+    }, [loading, getCurrentProfile, profile]) // UseEffect runs when loading is complete
 
     const { // Pull all the fields from the form data
         location,
@@ -43,16 +59,19 @@ const EditProfile = ({ updateProfile }) => {
 
             <form className='form' onSubmit={e => onSubmit(e)}>
                 <div className='form-group'>
+                    <h3>Location</h3>
                     <input type='text' placeholder='Location' name='location' value={location} onChange={e => onChange(e)}/>
                     <small className='form-text'>Where are you located?  May help connecting with other enthusiasts in your area</small>
                 </div>
 
                 <div className='form-group'>
+                    <h3>Bio</h3>
                     <textarea placeholder='Bio' name='bio' value={bio} onChange={e => onChange(e)}></textarea>
                     <small className='form-text'>Description about you and your cars</small>
                 </div>
 
                 <div className='form-group'>
+                    <h3>Organization</h3>
                     <input type='text' placeholder='Organization' name='organization' value={organization} onChange={e => onChange(e)}/>
                     <small className='form-text'>Organization you identify with (if any)</small>
                 </div>
@@ -81,8 +100,14 @@ const EditProfile = ({ updateProfile }) => {
 }
 
 EditProfile.propTypes = {
-    updateProfile: PropTypes.func.isRequired
+    updateProfile: PropTypes.func.isRequired,
+    getCurrentProfile: PropTypes.func.isRequired,
+    profile: PropTypes.object.isRequired
 }
 
+const mapStateToProps = state => ({
+    profile: state.profile
+})
+
 // If you are using history, must wrap component with 'withRouter'
-export default connect(null, { updateProfile })(EditProfile)
+export default connect(mapStateToProps, { updateProfile, getCurrentProfile })(EditProfile)

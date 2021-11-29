@@ -20,8 +20,10 @@ const UserSchema = new mongoose.Schema({
         },
         createdAt: {
             type: Date,
-            default: Date.now(),
-            expires: 600
+            default: Date.now()
+        },
+        expires: {
+            type: Number
         }
     },
     avatar: { // Avatar linked to cloudinary image
