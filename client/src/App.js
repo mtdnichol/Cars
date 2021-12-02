@@ -13,14 +13,12 @@ import Register from './components/auth/Register'
 import Login from './components/auth/Login'
 import Feed from "./components/feed/Feed";
 import Profile from "./components/profile/Profile";
-import EditProfile from "./components/profile/profile-forms/EditProfile";
+import EditProfile from "./components/settings/settings-forms/EditProfile";
 import PrivateRoute from "./components/routing/PrivateRoute"; // Ensures a user is authenticated before allowing them to access a page
-
+import ChangePassword from "./components/settings/settings-forms/ChangePassword";
 
 import './App.css';
 import setAuthToken from "./utils/setAuthToken";
-
-
 
 const App = () => {
     useEffect(() => { // Empty brackets make useEffect only run once, brackets prevent from infinite loop
@@ -51,6 +49,10 @@ const App = () => {
                     <Route
                         path="profile/edit"
                         element={<PrivateRoute component={ EditProfile } />}
+                    />
+                    <Route
+                        path="profile/changePassword"
+                        element={<PrivateRoute component={ ChangePassword } />}
                     />
                 </Routes>
             </Fragment>

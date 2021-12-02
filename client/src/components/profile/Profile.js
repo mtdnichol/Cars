@@ -10,18 +10,20 @@ const Profile = ({ getCurrentProfile, auth, profile: { profile } }) => {
         getCurrentProfile()
     }, [])
 
-    // @todo Separate profile sections into fragments, and use fragments to construct profile.
+    // @todo Separate profile fragments into fragments, and use fragments to construct profile.
     return (
         <section className="container">
             {profile === null ? (<Spinner />) : (
                 <Fragment>
-                    {auth.isAuthenticated &&
-                    auth.loading === false &&
-                    auth.user.id === profile.user.id && (
-                        <Link to="/profile/edit" className="btn btn-dark">
-                            Edit Profile
-                        </Link>
-                    )}
+                    <div>
+                        {auth.isAuthenticated &&
+                        auth.loading === false &&
+                        auth.user.id === profile.user.id && (
+                            <Link to="/profile/edit" className="btn btn-dark">
+                                Edit Profile
+                            </Link>
+                        )}
+                    </div>
                 </Fragment>
             )}
         </section>

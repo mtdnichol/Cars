@@ -42,8 +42,9 @@ router.post('/',
 
             //@todo Make a default avatar
             const avatar = {
-                url: "ads",
-                publicID: "asd"
+                url: "https://res.cloudinary.com/carsapp/image/upload/v1636927678/resources/default_user_f4m6wc.png",
+                publicID: "",
+                default: true
             }
 
             user = new User({ name, email, avatar, password })
@@ -77,6 +78,56 @@ router.post('/',
             return res.status(500).send('Server error')
         }
 })
+
+// @route         POST api/users/changePassword
+// Description:   Change password of an existing user
+// Access:        Private
+router.post('/changePassword', auth,
+    check('passwordOld', 'Old password is required').not().isEmpty(),
+    check('passwordNew', 'New password is required').not().isEmpty(),
+    check('passwordNewVerify', 'New password verification is required').not().isEmpty(),
+    check('passwordOld', 'Please enter a password greater than 6 characters').isLength({ min: 6 }),
+    async (req, res) => {
+        const errors = validationResult(req)
+
+        if(!errors.isEmpty()){ // If errors exist, bad request has been made.  Return 400 error
+            return res.status(400).json({ errors: errors.array() })
+        }
+
+        const {
+            passwordOld,
+            passwordNew,
+            passwordNewVerify
+        } = req.body
+
+        try {
+            // See if user exists
+            if(passwordNew !== passwordNewVerify) {
+                return res.status(400).json( {errors: [{msg: 'Passwords do not match'}]})
+            }
+
+            // Find the user in the current session
+            const user = await User.findOne({ _id: req.user.id })
+
+            // Check if their old password matches their current password
+            const isMatch = await bcrypt.compare(passwordOld, user.password)
+            if (!isMatch)
+                return res.status(400).json({errors: [{msg: 'Old password is incorrect'}]})
+            else {
+                //Encrypt password
+                const salt = await bcrypt.genSalt(10)
+                user.password = await bcrypt.hash(passwordNew, salt)
+
+                //Save user
+                await user.save()
+
+                return res.status(200).send('Password changed')
+            }
+        } catch (err) {
+            console.error(err.message)
+            return res.status(500).send('Server error')
+        }
+    })
 
 // @route         POST api/users/forgot
 // Description:   Send recovery token to user
